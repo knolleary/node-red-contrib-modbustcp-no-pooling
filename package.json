@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-modbustcp-no-pooling",
+  "name": "node-red-contrib-modbustcp",
   "version": "0.1.0",
   "description": "Node-RED nodes for communicating with a MODBUS TCP Server.",
   "main": "modbustcp.js",
