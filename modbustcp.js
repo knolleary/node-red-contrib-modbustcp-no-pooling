@@ -161,11 +161,11 @@ module.exports = function (RED) {
         this.dataType = config.dataType;
         this.adr = config.adr;
         this.quantity = config.quantity;
-        this.rate = config.rate;
+        //this.rate = config.rate;
         this.connection = null;
         var node = this;
         var modbusTCPServer = RED.nodes.getNode(config.server);  
-        var timerID;       
+        //var timerID;       
 
         this.on("input", function (msg) {            
             if (!(msg && msg.hasOwnProperty('payload'))) return;
@@ -185,7 +185,7 @@ module.exports = function (RED) {
                 }
 
                 node.receiveEvent2 = function(){                                
-                    node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});              
+                    node.status({fill:"green",shape:"dot",text:"Connected."});              
                     ModbusMaster(); //fire once at start
                     //timerID = setInterval(function(){                 
                       //ModbusMaster();
@@ -212,7 +212,7 @@ module.exports = function (RED) {
                                 }
                                 if (resp) 
                                 {
-                                    node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});
+                                    node.status({fill:"green",shape:"dot",text:"Connected."});
                                     msg.payload = resp.coils; // array of coil values
                                     node.send(msg);
                                 }
@@ -229,7 +229,7 @@ module.exports = function (RED) {
                                 }
                                 if (resp) 
                                 {
-                                    node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});
+                                    node.status({fill:"green",shape:"dot",text:"Connected."});
                                     msg.payload = resp.coils; // array of discrete input values
                                     node.send(msg);
                                 }
@@ -246,7 +246,7 @@ module.exports = function (RED) {
                                 }
                                 if (resp) 
                                 {
-                                    node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});
+                                    node.status({fill:"green",shape:"dot",text:"Connected."});
                                     msg.payload = resp.register; // array of register values
                                     node.send(msg);
                                 }
@@ -263,7 +263,7 @@ module.exports = function (RED) {
                                 }
                                 if (resp) 
                                 {                                    
-                                    node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});
+                                    node.status({fill:"green",shape:"dot",text:"Connected."});
                                     msg.payload = resp.register; // array of register values
                                     node.send(msg);                                    
                                 }
