@@ -285,7 +285,7 @@ module.exports = function (RED) {
                 }
                 
             });*/
-      
+        });
     }
     
     RED.nodes.registerType("modbustcp-read", ModbusTCPRead);
