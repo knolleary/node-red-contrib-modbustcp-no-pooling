@@ -167,32 +167,39 @@ module.exports = function (RED) {
         var modbusTCPServer = RED.nodes.getNode(config.server);  
         var timerID;       
 
-        modbusTCPServer.initializeModbusTCPConnection(function(connection){            
-            node.receiveEvent1 = function(){
-                if(!node.connection.isConnected())
-                {
-                    log('Modbus TCP Server Closed Connection');
-                    node.status({fill:"grey",shape:"dot",text:"Disconnected"});                       
-                }              
+        this.on("input", function (msg) {            
+            if (!(msg && msg.hasOwnProperty('payload'))) return;
+            
+            if (msg.payload == null) {
+                node.error('ModbusTCPClient: Invalid msg.payload!');
+                return;
             }
+            node.status(null);
+            modbusTCPServer.initializeModbusTCPConnection(function(connection){            
+                node.receiveEvent1 = function(){
+                    if(!node.connection.isConnected())
+                    {
+                        log('Modbus TCP Server Closed Connection');
+                        node.status({fill:"grey",shape:"dot",text:"Disconnected"});                       
+                    }              
+                }
 
-            node.receiveEvent2 = function(){                                
-                node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});              
-                ModbusMaster(); //fire once at start
-                timerID = setInterval(function(){                 
-                  ModbusMaster();
-                }, node.rate * 1000);  
-            }           
+                node.receiveEvent2 = function(){                                
+                    node.status({fill:"green",shape:"dot",text:"Connected: Rate:" + node.rate + " s"});              
+                    ModbusMaster(); //fire once at start
+                    //timerID = setInterval(function(){                 
+                      //ModbusMaster();
+                    //}, node.rate * 1000);  
+                }           
 
-            node.connection = connection;
-            node.connection.on('close', node.receiveEvent1);
-            node.connection.on('connect', node.receiveEvent2);
+                node.connection = connection;
+                node.connection.on('close', node.receiveEvent1);
+                node.connection.on('connect', node.receiveEvent2);
 
-            function ModbusMaster() {
-                var msg = {};  
-                msg.topic = node.name;              
-                if(node.connection.isConnected())
-                {          
+                function ModbusMaster() {
+                    var msg = {};  
+                    msg.topic = node.name;              
+
                     switch (node.dataType){
                         case "Coil": //FC: 1
                             node.status({fill:"yellow",shape:"dot",text:"Polling"});
@@ -263,19 +270,12 @@ module.exports = function (RED) {
                             });
                             break;
                     }
-                } 
-                else
-                {
-                    log('No Modbus TCP Server Connection Detected, Initiating....');
-                    clearInterval(timerID);
-                    node.connection = modbusTCPServer.initializeModbusTCPConnection(); 
-                    node.connection.on('close', node.receiveEvent1);
-                    node.connection.on('connect', node.receiveEvent2);                                      
-                }                        
-            }
-            
-        });           
-            node.on("close", function () {
+                                         
+                }
+                
+            });           
+
+            /*node.on("close", function () {
                 if(node.connection.isConnected())
                 {
                     node.connection.close();
@@ -284,7 +284,8 @@ module.exports = function (RED) {
                     node.status({fill:"grey",shape:"dot",text:"Disconnected"});
                 }
                 
-            });
+            });*/
+      
     }
     
     RED.nodes.registerType("modbustcp-read", ModbusTCPRead);

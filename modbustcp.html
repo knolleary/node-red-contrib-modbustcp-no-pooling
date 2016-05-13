@@ -105,10 +105,10 @@
         <label for="node-input-quantity"><i class="icon-bookmark"></i> Quantity</label>
         <input type="text" id="node-input-quantity" placeholder="1-65535">
     </div>
-    <div class="form-row">
+    <!--<div class="form-row">
         <label for="node-input-rate"><i class="icon-bookmark"></i> Poll Rate (s)</label>
         <input type="number" id="node-input-rate" placeholder="1-65535">
-    </div>
+    </div>-->
         <div class="form-row">
         <label for="node-input-server"><i class="icon-globe"></i> Server</label>
         <input type="text" id="node-input-server">
@@ -173,10 +173,10 @@
             dataType: {value: "", required: true},
             adr: {value: "", required: true, validate: RED.validators.number()},
             quantity: {value: "", required:true, validate: RED.validators.number()},  
-            rate: {value:"", required:true, validate:function(v) { return v > 0 } },         
+            //rate: {value:"", required:true, validate:function(v) { return v > 0 } },         
             server: {value: "", type: "modbustcp-server"}
         },
-        inputs: 0,
+        inputs: 1,
         outputs: 1,
         icon: "bridge.png",        
         paletteLabel: "modbustcp",
