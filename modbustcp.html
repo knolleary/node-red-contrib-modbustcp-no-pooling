@@ -29,7 +29,7 @@
  * limitations under the License.
 -->
 
-<script type="text/x-red" data-template-name="modbustcp-server">
+<script type="text/x-red" data-template-name="modbustcp-no-pooling-server">
     <div class="form-row">
         <label for="node-config-input-host"><i class="icon-bookmark"></i> Host</label>
         <input type="text" id="node-config-input-host">
@@ -44,11 +44,11 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="modbustcp-server">
+<script type="text/x-red" data-help-name="modbustcp-no-pooling-server">
     <p>Uses MODBUS TCP to read/write ethernet host:port and register/coil addresses.</p>
 </script>
 
-<script type="text/x-red" data-template-name="modbustcp-write">
+<script type="text/x-red" data-template-name="modbustcp-no-pooling-write">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -70,7 +70,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="modbustcp-write">
+<script type="text/x-red" data-help-name="modbustcp-no-pooling-write">
     <p>Modbus TCP client node.  Connects to a Modbus TCP server to write <b>msg.payload</b> to a coil or register.
     <h4>Function codes currently supported include:</h4>
         <ul>
@@ -83,7 +83,7 @@
      </p>
 </script>
 
-<script type="text/x-red" data-template-name="modbustcp-read">
+<script type="text/x-red" data-template-name="modbustcp-no-pooling-read">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -115,7 +115,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="modbustcp-read">
+<script type="text/x-red" data-help-name="modbustcp-no-pooling-read">
     <p>Modbus TCP client node.  Connects to a Modbus TCP server to read register values at a given poll rate.
     <h4>Function codes currently supported include:</h4>
         <ul>
@@ -130,7 +130,7 @@
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('modbustcp-server', {
+    RED.nodes.registerType('modbustcp-no-pooling-server', {
         category: 'config',
         defaults: {
             host: {value: "127.0.0.1", required: true},
@@ -138,34 +138,34 @@
             unit_id: {value:1, required:true, validate: RED.validators.number()}            
         },
         label: function () {
-            return "modbustcp@" + this.host + ":" + this.port;
+            return "modbustcp-no-pooling@" + this.host + ":" + this.port;
         }
     });
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('modbustcp-write', {
+    RED.nodes.registerType('modbustcp-no-pooling-write', {
         category: 'output',
         color: '#E9967A',
         defaults: {
             name: {value: ""},
             dataType: {value: "", required: true},
             adr: {value: "", required: true, validate: RED.validators.number()},
-            server: {value: "", type: "modbustcp-server"}
+            server: {value: "", type: "modbustcp-no-pooling-server"}
         },
         inputs: 1,
         outputs: 0,
         icon: "bridge.png",
         align: 'right',
-        paletteLabel: "modbustcp",
+        paletteLabel: "modbustcp-no-pooling",
         label: function () {
-            return (this.name || "modbustcp");
+            return (this.name || "modbustcp-no-pooling");
         }
     });
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('modbustcp-read', {
+    RED.nodes.registerType('modbustcp-no-pooling-read', {
         category: 'input',
         color: '#E9967A',
         defaults: {
@@ -174,14 +174,14 @@
             adr: {value: "", required: true, validate: RED.validators.number()},
             quantity: {value: "", required:true, validate: RED.validators.number()},  
             //rate: {value:"", required:true, validate:function(v) { return v > 0 } },         
-            server: {value: "", type: "modbustcp-server"}
+            server: {value: "", type: "modbustcp-no-pooling-server"}
         },
         inputs: 1,
         outputs: 1,
         icon: "bridge.png",        
-        paletteLabel: "modbustcp",
+        paletteLabel: "modbustcp-no-pooling",
         label: function () {
-            return (this.name || "modbustcp");
+            return (this.name || "modbustcp-no-pooling");
         }
     });
 </script>

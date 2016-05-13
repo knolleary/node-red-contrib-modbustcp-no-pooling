@@ -86,7 +86,7 @@ module.exports = function (RED) {
         });
     }
 
-    RED.nodes.registerType("modbustcp-server", ModbusTCPServerNode);
+    RED.nodes.registerType("modbustcp-no-pooling-server", ModbusTCPServerNode);
   
     function ModbusTCPWrite(config) {
         RED.nodes.createNode(this, config);
@@ -153,7 +153,7 @@ module.exports = function (RED) {
     }
 
     //
-    RED.nodes.registerType("modbustcp-write", ModbusTCPWrite);
+    RED.nodes.registerType("modbustcp-no-pooling-write", ModbusTCPWrite);
 
     function ModbusTCPRead(config) {
         RED.nodes.createNode(this, config);
@@ -161,11 +161,9 @@ module.exports = function (RED) {
         this.dataType = config.dataType;
         this.adr = config.adr;
         this.quantity = config.quantity;
-        //this.rate = config.rate;
         this.connection = null;
         var node = this;
         var modbusTCPServer = RED.nodes.getNode(config.server);  
-        //var timerID;       
 
         this.on("input", function (msg) {            
             if (!(msg && msg.hasOwnProperty('payload'))) return;
@@ -180,16 +178,13 @@ module.exports = function (RED) {
                     if(!node.connection.isConnected())
                     {
                         log('Modbus TCP Server Closed Connection');
-                        node.status({fill:"grey",shape:"dot",text:"Disconnected"});                       
+                        node.status({fill:"grey",shape:"dot",text:"Disconnected."});                       
                     }              
                 }
 
                 node.receiveEvent2 = function(){                                
                     node.status({fill:"green",shape:"dot",text:"Connected."});              
-                    ModbusMaster(); //fire once at start
-                    //timerID = setInterval(function(){                 
-                      //ModbusMaster();
-                    //}, node.rate * 1000);  
+                    ModbusMaster();
                 }           
 
                 node.connection = connection;
@@ -275,19 +270,9 @@ module.exports = function (RED) {
                 
             });           
 
-            /*node.on("close", function () {
-                if(node.connection.isConnected())
-                {
-                    node.connection.close();
-                    console.log("MODBUS TCP Client Closed"); 
-                    clearInterval(timerID);                   
-                    node.status({fill:"grey",shape:"dot",text:"Disconnected"});
-                }
-                
-            });*/
         });
     }
     
-    RED.nodes.registerType("modbustcp-read", ModbusTCPRead);
+    RED.nodes.registerType("modbustcp-no-pooling-read", ModbusTCPRead);
 
 }
