@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-modbustcp",
+  "name": "node-red-contrib-modbustcp-no-pooling",
   "version": "0.1.0",
   "description": "Node-RED nodes for communicating with a MODBUS TCP Server.",
   "main": "modbustcp.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Argonne-National-Laboratory/node-red-contrib-modbustcp.git"
+    "url": "git+https://github.com/altamira/node-red-contrib-modbustcp.git"
   },
   "keywords": [
     "node-red",
@@ -25,10 +25,10 @@
       "modbus tcp": "modbustcp.js"
     }
   },
-  "author": "Jason D. Harper",
+  "author": "Alessandro H.",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/Argonne-National-Laboratory/node-red-contrib-modbustcp/issues"
+    "url": "https://github.com/altamira/node-red-contrib-modbustcp/issues"
   },
-  "homepage": "https://github.com/Argonne-National-Laboratory/node-red-contrib-modbustcp#readme"
+  "homepage": "https://github.com/altamira/node-red-contrib-modbustcp#readme"
 }
