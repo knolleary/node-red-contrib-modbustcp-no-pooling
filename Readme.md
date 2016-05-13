@@ -21,6 +21,7 @@ Run the following command in the root directory of your Node-RED install
 #Author
 
 [Jason D. Harper][3] 
+
 [Alessandro Holanda][4]
 
 
