@@ -182,92 +182,83 @@ module.exports = function (RED) {
                     }              
                 }
 
-                node.receiveEvent2 = function(){                                
-                    node.status({fill:"green",shape:"dot",text:"Connected."});              
-                    ModbusMaster();
-                }           
-
                 node.connection = connection;
                 node.connection.on('close', node.receiveEvent1);
-                node.connection.on('connect', node.receiveEvent2);
 
-                function ModbusMaster() {
-                    var msg = {};  
-                    msg.topic = node.name;              
+                var msg = {};  
+                msg.topic = node.name;              
 
-                    switch (node.dataType){
-                        case "Coil": //FC: 1
-                            node.status({fill:"yellow",shape:"dot",text:"Polling"});
-                            node.connection.readCoils(node.adr,node.quantity, function (resp, err) { 
-                                if (err) {
-                                    node.status({fill:"red",shape:"dot",text:"Error"});
-                                    console.log(err); 
-                                    node.error('ModbusTCPClient: ' + JSON.stringify(err));
-                                    return;
-                                }
-                                if (resp) 
-                                {
-                                    node.status({fill:"green",shape:"dot",text:"Connected."});
-                                    msg.payload = resp.coils; // array of coil values
-                                    node.send(msg);
-                                }
-                            });
-                            break;
-                        case "Input": //FC: 2
-                            node.status({fill:"yellow",shape:"dot",text:"Polling"});
-                            node.connection.readDiscreteInput(node.adr,node.quantity, function (resp, err) { 
-                                if (err) {
-                                    node.status({fill:"red",shape:"dot",text:"Error"});
-                                    console.log(err); 
-                                    node.error('ModbusTCPClient: ' + JSON.stringify(err));
-                                    return;
-                                }
-                                if (resp) 
-                                {
-                                    node.status({fill:"green",shape:"dot",text:"Connected."});
-                                    msg.payload = resp.coils; // array of discrete input values
-                                    node.send(msg);
-                                }
-                            });
-                            break;
-                        case "HoldingRegister": //FC: 3
-                            node.status({fill:"yellow",shape:"dot",text:"Polling"});
-                            node.connection.readHoldingRegister(node.adr,node.quantity, function (resp, err) { 
-                                if (err) {
-                                    node.status({fill:"red",shape:"dot",text:"Error"});
-                                    console.log(err); 
-                                    node.error('ModbusTCPClient: ' + JSON.stringify(err));
-                                    return;
-                                }
-                                if (resp) 
-                                {
-                                    node.status({fill:"green",shape:"dot",text:"Connected."});
-                                    msg.payload = resp.register; // array of register values
-                                    node.send(msg);
-                                }
-                            });
-                            break;
-                        case "InputRegister": //FC: 4                        
-                            node.status({fill:"yellow",shape:"dot",text:"Polling"});
-                            node.connection.readInputRegister(node.adr,node.quantity, function (resp, err) { 
-                                if (err) {
-                                    node.status({fill:"red",shape:"dot",text:"Error"});
-                                    console.log(err); 
-                                    node.error('ModbusTCPClient: ' + JSON.stringify(err));
-                                    return;
-                                }
-                                if (resp) 
-                                {                                    
-                                    node.status({fill:"green",shape:"dot",text:"Connected."});
-                                    msg.payload = resp.register; // array of register values
-                                    node.send(msg);                                    
-                                }
-                            });
-                            break;
-                    }
-                                         
+                switch (node.dataType){
+                    case "Coil": //FC: 1
+                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.connection.readCoils(node.adr,node.quaintty, function (resp, err) { 
+                            if (err) {
+                                node.status({fill:"red",shape:"dot",text:"Error"});
+                                console.log(err); 
+                                node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                return;
+                            }
+                            if (resp) 
+                            {
+                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                msg.payload = resp.coils; // array of coil values
+                                node.send(msg);
+                            }
+                        });
+                        break;
+                    case "Input": //FC: 2
+                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.connection.readDiscreteInput(node.adr,node.quantity, function (resp, err) { 
+                            if (err) {
+                                node.status({fill:"red",shape:"dot",text:"Error"});
+                                console.log(err); 
+                                node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                return;
+                            }
+                            if (resp) 
+                            {
+                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                msg.payload = resp.coils; // array of discrete input values
+                                node.send(msg);
+                            }
+                        });
+                        break;
+                    case "HoldingRegister": //FC: 3
+                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.connection.readHoldingRegister(node.adr,node.quantity, function (resp, err) { 
+                            if (err) {
+                                node.status({fill:"red",shape:"dot",text:"Error"});
+                                console.log(err); 
+                                node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                return;
+                            }
+                            if (resp) 
+                            {
+                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                msg.payload = resp.register; // array of register values
+                                node.send(msg);
+                            }
+                        });
+                        break;
+                    case "InputRegister": //FC: 4                        
+                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.connection.readInputRegister(node.adr,node.quantity, function (resp, err) { 
+                            if (err) {
+                                node.status({fill:"red",shape:"dot",text:"Error"});
+                                console.log(err); 
+                                node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                return;
+                            }
+                            if (resp) 
+                            {                                    
+                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                msg.payload = resp.register; // array of register values
+                                node.send(msg);                                    
+                            }
+                        });
+                        break;
                 }
-                
+                                         
             });           
 
         });
