@@ -129,6 +129,7 @@ module.exports = function (RED) {
                             {
                                 node.status({fill:"green",shape:"dot",text:util.inspect(resp, false, null)});
                             }
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });                    
                         
                         break;
@@ -144,12 +145,13 @@ module.exports = function (RED) {
                             {
                                 node.status({fill:"green",shape:"dot",text:util.inspect(resp, false, null)});
                             }
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });                         
                         
                         break
                 }
             })
-        });              
+        }); 
     }
 
     //
@@ -204,6 +206,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.coils; // array of coil values
                                 node.send(msg);
                             }
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "Input": //FC: 2
@@ -221,6 +224,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.coils; // array of discrete input values
                                 node.send(msg);
                             }
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "HoldingRegister": //FC: 3
@@ -238,6 +242,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.register; // array of register values
                                 node.send(msg);
                             }
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "InputRegister": //FC: 4                        
@@ -255,6 +260,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.register; // array of register values
                                 node.send(msg);                                    
                             }
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                 }
