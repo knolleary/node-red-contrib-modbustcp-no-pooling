@@ -82,7 +82,7 @@ module.exports = function (RED) {
         
         node.on("close", function () {
             log('disconnecting from modbustcp slave at ' + config.host + ':' + config.port);
-            node.modbusconn && node.modbusconn.isConnected();
+            node.modbusconn && node.modbusconn.isConnected() && node.modbusconn.close();
         });
     }
 
@@ -200,7 +200,7 @@ module.exports = function (RED) {
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
                                 msg.payload = resp.coils; // array of coil values
                                 node.send(msg);
                             }
@@ -217,7 +217,7 @@ module.exports = function (RED) {
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
                                 msg.payload = resp.coils; // array of discrete input values
                                 node.send(msg);
                             }
@@ -234,7 +234,7 @@ module.exports = function (RED) {
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
                                 msg.payload = resp.register; // array of register values
                                 node.send(msg);
                             }
@@ -251,7 +251,7 @@ module.exports = function (RED) {
                             }
                             if (resp) 
                             {                                    
-                                node.status({fill:"green",shape:"dot",text:"Connected."});
+                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
                                 msg.payload = resp.register; // array of register values
                                 node.send(msg);                                    
                             }
