@@ -55,26 +55,30 @@ module.exports = function (RED) {
         this.modbusconn = null;        
         var node = this;
 
-        node.initializeModbusTCPConnection = function (handler) {
+        node.initializeModbusTCPConnection = function (nodeClient, callback) {
             if (node.modbusconn && node.modbusconn.isConnected()) {
                 log('Already connected to modbustcp slave at ' + config.host + ':' + config.port);
-                if (handler && (typeof handler === 'function')){
-                    handler(node.modbusconn);
+                if (callback && (typeof callback === 'function')){
+                    callback(node.modbusconn);
                 }
                 return node.modbusconn;
             }
             log('Connecting to modbustcp slave at ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
             node.modbusconn = null;
+            console.log('Node origin: ' + nodeClient);
+            node.source = nodeClient;
             node.modbusconn = modbus.createTCPClient(config.port, config.host, Number(config.unit_id), function(err){
                 if (err) {                                      
                     node.error('ModbusTCPConnection: ' + util.inspect(err, false, null));
+                    console.log('Node origin: ' + node.modbusconn);
+                    node.source.send([null, { payload: 'ModbusTCPConnection: ' + util.inspect(err, false, null)}]);
                     return null;
                 } 
                 log('ModbusTCP: successfully connected to ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
             });
 
-            if (handler && (typeof handler === 'function'))            
-                handler(node.modbusconn);    
+            if (callback && (typeof callback === 'function'))            
+                callback(node.modbusconn);    
                        
             return node.modbusconn;
 
@@ -105,7 +109,7 @@ module.exports = function (RED) {
                 return;
             }
             node.status(null);
-            modbusTCPServer.initializeModbusTCPConnection(function(connection){
+            modbusTCPServer.initializeModbusTCPConnection(node, function(connection){
                 node.receiveEvent1 = function(){
                     if(!node.connection.isConnected())
                     {
@@ -123,11 +127,14 @@ module.exports = function (RED) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err);                                 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'writeSingleCoil: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:util.inspect(resp, false, null)});
+                                //node.status({fill:"green",shape:"dot",text:util.inspect(resp, false, null)});
+                                node.status({fill:"green",shape:"dot",text:"Write: [" + msg.payload + "]"});
+                                node.send([msg, null]);
                             }
                             node.connection && node.connection.isConnected() && node.connection.close();
                         });                    
@@ -139,11 +146,14 @@ module.exports = function (RED) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err); 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'writeSingleRegister: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:util.inspect(resp, false, null)});
+                                //node.status({fill:"green",shape:"dot",text:util.inspect(resp, false, null)});
+                                node.status({fill:"green",shape:"dot",text:"Write: [" + msg.payload + "]"});
+                                node.send([msg, null]);
                             }
                             node.connection && node.connection.isConnected() && node.connection.close();
                         });                         
@@ -175,7 +185,7 @@ module.exports = function (RED) {
                 return;
             }
             node.status(null);
-            modbusTCPServer.initializeModbusTCPConnection(function(connection){            
+            modbusTCPServer.initializeModbusTCPConnection(node, function(connection){            
                 node.receiveEvent1 = function(){
                     if(!node.connection.isConnected())
                     {
@@ -192,73 +202,77 @@ module.exports = function (RED) {
 
                 switch (node.dataType){
                     case "Coil": //FC: 1
-                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.status({fill:"yellow",shape:"dot",text:"Connecting"});
                         node.connection.readCoils(node.adr,node.quaintty, function (resp, err) { 
                             if (err) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err); 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'readCoils: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
+                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.coils + "]"});
                                 msg.payload = resp.coils; // array of coil values
-                                node.send(msg);
+                                node.send([msg, null]);
                             }
                             node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "Input": //FC: 2
-                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.status({fill:"yellow",shape:"dot",text:"Connecting"});
                         node.connection.readDiscreteInput(node.adr,node.quantity, function (resp, err) { 
                             if (err) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err); 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'readDiscreteInput: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
+                                node.status({fill:"green",shape:"dot",text:"Read: [" + resp.coils + "]"});
                                 msg.payload = resp.coils; // array of discrete input values
-                                node.send(msg);
+                                node.send([msg, null]);
                             }
                             node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "HoldingRegister": //FC: 3
-                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.status({fill:"yellow",shape:"dot",text:"Connecting"});
                         node.connection.readHoldingRegister(node.adr,node.quantity, function (resp, err) { 
                             if (err) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err); 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'readDiscreteInput: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
                             {
-                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
+                                node.status({fill:"green",shape:"dot",text:"Read: [" + resp.register + "]"});
                                 msg.payload = resp.register; // array of register values
-                                node.send(msg);
+                                node.send([msg, null]);
                             }
                             node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "InputRegister": //FC: 4                        
-                        node.status({fill:"yellow",shape:"dot",text:"Polling"});
+                        node.status({fill:"yellow",shape:"dot",text:"Connecting"});
                         node.connection.readInputRegister(node.adr,node.quantity, function (resp, err) { 
                             if (err) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err); 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'readDiscreteInput: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
                             {                                    
-                                node.status({fill:"green",shape:"dot",text:"Ready: [" + resp.register + "]"});
+                                node.status({fill:"green",shape:"dot",text:"Read: [" + resp.register + "]"});
                                 msg.payload = resp.register; // array of register values
-                                node.send(msg);                                    
+                                node.send([msg, null]);                                    
                             }
                             node.connection && node.connection.isConnected() && node.connection.close();
                         });
