@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-modbustcp-no-pooling",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Node-RED nodes for communicating with a MODBUS TCP Server with no pooling to slave device registers.",
   "main": "modbustcp.js",
   "dependencies": {
