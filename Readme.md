@@ -28,4 +28,4 @@ Run the following command in the root directory of your Node-RED install
 [1]:http://nodered.org
 [2]:https://www.npmjs.com/package/jsmodbus
 [3]:https://github.com/jayharper
-[4]:https://github.com/alessandro-holanda
+[4]:https://github.com/alessh
