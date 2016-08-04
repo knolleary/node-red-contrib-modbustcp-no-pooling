@@ -55,26 +55,26 @@ module.exports = function (RED) {
         this.modbusconn = null;        
         var node = this;
 
-        node.initializeModbusTCPConnection = function (nodeClient, callback) {
+        node.initializeModbusTCPConnectionWrite = function (nodeClient, callback) {
             if (node.modbusconn && node.modbusconn.isConnected()) {
-                log('Already connected to modbustcp slave at ' + config.host + ':' + config.port);
+                log('Already connected to modbustcp for write slave at ' + config.host + ':' + config.port);
                 if (callback && (typeof callback === 'function')){
                     callback(node.modbusconn);
                 }
                 return node.modbusconn;
             }
-            log('Connecting to modbustcp slave at ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
+            log('Connecting to modbustcp slave for write at ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
             node.modbusconn = null;
             console.log('Node origin: ' + nodeClient);
             node.source = nodeClient;
             node.modbusconn = modbus.createTCPClient(config.port, config.host, Number(config.unit_id), function(err){
                 if (err) {                                      
-                    node.error('ModbusTCPConnection: ' + util.inspect(err, false, null));
+                    node.error('ModbusTCPConnectionWrite: ' + util.inspect(err, false, null));
                     console.log('Node origin: ' + node.modbusconn);
-                    node.source.send([null, { payload: 'ModbusTCPConnection: ' + util.inspect(err, false, null)}]);
+                    node.source.send([null, { payload: 'ModbusTCPConnectionWrite: ' + util.inspect(err, false, null)}]);
                     return null;
                 } 
-                log('ModbusTCP: successfully connected to ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
+                log('ModbusTCP Write: successfully connected to ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
             });
 
             if (callback && (typeof callback === 'function'))            
@@ -83,7 +83,35 @@ module.exports = function (RED) {
             return node.modbusconn;
 
         };
-        
+
+        node.initializeModbusTCPConnectionRead = function (nodeClient, callback) {
+            if (node.modbusconn && node.modbusconn.isConnected()) {
+                log('Already connected to modbustcp for read slave at ' + config.host + ':' + config.port);
+                if (callback && (typeof callback === 'function')){
+                    callback(node.modbusconn);
+                }
+                return node.modbusconn;
+            }
+            log('Connecting to modbustcp for read slave at ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
+            node.modbusconn = null;
+            console.log('Node origin: ' + nodeClient);
+            node.source = nodeClient;
+            node.modbusconn = modbus.createTCPClient(config.port, config.host, Number(config.unit_id), function(err){
+                if (err) {                                      
+                    node.error('ModbusTCPConnectionRead: ' + util.inspect(err, false, null));
+                    console.log('Node origin: ' + node.modbusconn);
+                    node.source.send([null, { payload: 'ModbusTCPConnectionRead: ' + util.inspect(err, false, null)}]);
+                    return null;
+                } 
+                log('ModbusTCP Read: successfully connected to ' + config.host + ':' + config.port + ' unit_id: ' + config.unit_id);
+            });
+
+            if (callback && (typeof callback === 'function'))            
+                callback(node.modbusconn);    
+                       
+            return node.modbusconn;
+
+        };        
         node.on("close", function () {
             log('disconnecting from modbustcp slave at ' + config.host + ':' + config.port);
             node.modbusconn && node.modbusconn.isConnected() && node.modbusconn.close();
@@ -105,15 +133,15 @@ module.exports = function (RED) {
             if (!(msg && msg.hasOwnProperty('payload'))) return;
             
             if (msg.payload == null) {
-                node.error('ModbusTCPClient: Invalid msg.payload!');
+                node.error('ModbusTCPClientWrite: Invalid msg.payload!');
                 return;
             }
             node.status(null);
-            modbusTCPServer.initializeModbusTCPConnection(node, function(connection){
+            modbusTCPServer.initializeModbusTCPConnectionWrite(node, function(connection){
                 node.receiveEvent1 = function(){
                     if(!node.connection.isConnected())
                     {
-                        log('Modbus TCP Server Closed Connection');
+                        log('Modbus TCP Server Closed Connection Write');
                         node.status({fill:"grey",shape:"dot",text:"Disconnected"});                           
                     }              
                 }
@@ -126,8 +154,8 @@ module.exports = function (RED) {
                             if (err) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err);                                 
-                                node.error('ModbusTCPClient: ' + JSON.stringify(err));
-                                node.send([null, { payload: 'writeSingleCoil: ' + JSON.stringify(err)}]);
+                                node.error('ModbusTCPClientWrite: ' + JSON.stringify(err));
+                                node.send([null, { payload: 'writeSingleCoilWrite: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
@@ -136,7 +164,7 @@ module.exports = function (RED) {
                                 node.status({fill:"green",shape:"dot",text:"Write: [" + msg.payload + "]"});
                                 node.send([msg, null]);
                             }
-                            //node.connection && node.connection.isConnected() && node.connection.close();
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });                    
                         
                         break;
@@ -146,7 +174,7 @@ module.exports = function (RED) {
                                 node.status({fill:"red",shape:"dot",text:"Error"});
                                 console.log(err); 
                                 node.error('ModbusTCPClient: ' + JSON.stringify(err));
-                                node.send([null, { payload: 'writeSingleRegister: ' + JSON.stringify(err)}]);
+                                node.send([null, { payload: 'writeSingleRegisterWrite: ' + JSON.stringify(err)}]);
                                 return;
                             }
                             if (resp) 
@@ -155,7 +183,7 @@ module.exports = function (RED) {
                                 node.status({fill:"green",shape:"dot",text:"Write: [" + msg.payload + "]"});
                                 node.send([msg, null]);
                             }
-                            //node.connection && node.connection.isConnected() && node.connection.close();
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });                         
                         
                         break
@@ -181,15 +209,15 @@ module.exports = function (RED) {
             if (!(msg && msg.hasOwnProperty('payload'))) return;
             
             if (msg.payload == null) {
-                node.error('ModbusTCPClient: Invalid msg.payload!');
+                node.error('ModbusTCPClientRead: Invalid msg.payload!');
                 return;
             }
             node.status(null);
-            modbusTCPServer.initializeModbusTCPConnection(node, function(connection){            
+            modbusTCPServer.initializeModbusTCPConnectionRead(node, function(connection){            
                 node.receiveEvent1 = function(){
                     if(!node.connection.isConnected())
                     {
-                        log('Modbus TCP Server Closed Connection');
+                        log('Modbus TCP Server Closed Connection Read');
                         node.status({fill:"grey",shape:"dot",text:"Disconnected."});                       
                     }              
                 }
@@ -217,7 +245,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.coils; // array of coil values
                                 node.send([msg, null]);
                             }
-                            //node.connection && node.connection.isConnected() && node.connection.close();
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "Input": //FC: 2
@@ -236,7 +264,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.coils; // array of discrete input values
                                 node.send([msg, null]);
                             }
-                            //node.connection && node.connection.isConnected() && node.connection.close();
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "HoldingRegister": //FC: 3
@@ -255,7 +283,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.register; // array of register values
                                 node.send([msg, null]);
                             }
-                            //node.connection && node.connection.isConnected() && node.connection.close();
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                     case "InputRegister": //FC: 4                        
@@ -274,7 +302,7 @@ module.exports = function (RED) {
                                 msg.payload = resp.register; // array of register values
                                 node.send([msg, null]);                                    
                             }
-                            //node.connection && node.connection.isConnected() && node.connection.close();
+                            node.connection && node.connection.isConnected() && node.connection.close();
                         });
                         break;
                 }
