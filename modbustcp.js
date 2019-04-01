@@ -43,7 +43,6 @@ function log(msg, args) {
 
 
 module.exports = function (RED) {
-    var RED = require(process.env.NODE_RED_HOME+"/red/red");    
     var modbus = require('jsmodbus');
     var util = require('util');
 
